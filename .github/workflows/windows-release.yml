@@ -16,9 +16,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-latest]
-        include:
-          - os: windows-latest
-            vcpkgCommitId: '74e6536215718009aae747d86d84b78376bf9e09'
+        # include:
+        #   - os: windows-latest
+        #     vcpkgCommitId: '74e6536215718009aae747d86d84b78376bf9e09'
     steps:
    
     - uses: actions/checkout@v5
@@ -34,7 +34,6 @@ jobs:
     - name: Install dependencies
       run: |
         go get .
-        go install fyne.io/tools/cmd/fyne@latest
         .\setup_build_env.ps1
     
     - name: Build

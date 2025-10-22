@@ -35,23 +35,11 @@ Invoke-WebRequest -Uri $llvm -OutFile "$temp_dir\llvm-mingw.zip"
 Expand-Archive -Path "$temp_dir\llvm-mingw.zip" -DestinationPath ".\" -Force
 
 # rename folder llvm-mingw-20251007-ucrt-x86_64 to llvm-mingw
-Write-Output "Renaming llvm-MinGW folder"
+Write-Output "Renaming llvm-mingw folder"
 Rename-Item -Path ".\llvm-mingw-20251007-ucrt-x86_64" -NewName "llvm-mingw"
 
 Write-Output "Installing CANLIB"
 Start-Process -FilePath "$temp_dir\canlib.exe" -ArgumentList "/S" -Wait
-
-Write-Output "Setting up vcpkg"
-if (-not (Test-Path -Path ".\vcpkg")) {
-    git clone https://github.com/microsoft/vcpkg.git --depth=1
-}
-
-Write-Output "Bootstrapping vcpkg"
-.\vcpkg\bootstrap-vcpkg.bat -disableMetrics
-
-Write-Output "Installing libusb"
-.\vcpkg\vcpkg.exe install 'libusb:x64-windows'
-# .\vcpkg\vcpkg.exe install 'libusb:x86-windows'
 
 Write-Output "Cleaning up"
 Remove-Item -Recurse -Force -Path $temp_dir

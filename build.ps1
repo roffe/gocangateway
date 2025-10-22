@@ -16,5 +16,5 @@ $libs = @(
 $env:CGO_CFLAGS = ($includes | ForEach-Object { '-I' + $_ }) -join ' '
 $env:CGO_LDFLAGS = ($libs | ForEach-Object { '-L' + $_ }) -join ' '
 $env:GOARCH = "386"
-go build -tags="canlib,j2534" -ldflags '-s -w -H=windowsgui' .
+go build -tags="canlib,j2534" -ldflags '-s -w -H=windowsgui' -o cangateway.exe .
 

@@ -28,7 +28,7 @@ Write-Output "Extracting CANUSB"
 Expand-Archive -Path "$temp_dir\canusb_dll_driver.zip" -DestinationPath ".\canusb" -Force
 
 # download llvm-mingw
-Write-Output "Downloading llvm-MinGW"
+Write-Output "Downloading llvm-mingw"
 Invoke-WebRequest -Uri $llvm -OutFile "$temp_dir\llvm-mingw.zip"
 
 # Write-Output "Extracting llvm-MinGW"

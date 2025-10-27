@@ -43,6 +43,8 @@ github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRI
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/roffe/gocan v1.2.1 h1:lsUJNdgB3FYqtZiWnBGWzPwJpRSz2EEed/QQGCJLwPM=
 github.com/roffe/gocan v1.2.1/go.mod h1:IY15n6sO4gPvQ3EO251Fl+G1S+0MnErQfpJcUpGIJK8=
+github.com/roffe/gocan v1.2.2 h1:qfXEvvkQ29c66b37kiJubZ6iKJfFr05rGl+tGst18I8=
+github.com/roffe/gocan v1.2.2/go.mod h1:hpOAwcukZhDbmknIkhljmcQcWFcKXI8I2VqDxKOj0jU=
 github.com/roffe/gocanusb v1.1.2 h1:qnPhGLIeTXkBKQiGNV/vZfcXMwRmL1XsEeorGmPHD+A=
 github.com/roffe/gocanusb v1.1.2/go.mod h1:zRgZyTCvOyLIMeW+d9aUPmoJC3PId0PUJF0IVNQ70Z4=
 github.com/roffe/goftdi v0.0.0-20250330120219-31feb988cb73 h1:ws9di8cqLErxvao9FI5cRU7s2XcsMcqhPMrNsKNcMSY=

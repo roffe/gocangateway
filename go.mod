@@ -5,7 +5,7 @@ go 1.25.3
 require (
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/energye/systray v1.0.2
-	github.com/roffe/gocan v1.2.2
+	github.com/roffe/gocan v1.2.6
 	golang.org/x/sync v0.17.0
 	google.golang.org/grpc v1.76.0
 	google.golang.org/protobuf v1.36.10
@@ -15,7 +15,6 @@ require (
 	github.com/albenik/bcd v0.0.0-20170831201648-635201416bc7 // indirect
 	github.com/bendikro/dl v0.0.0-20190410215913-e41fdb9069d4 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/fatih/color v1.18.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/golang/mock v1.6.0 // indirect
@@ -26,10 +25,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mdlayher/netlink v1.7.2 // indirect
 	github.com/mdlayher/socket v0.5.1 // indirect
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
-	github.com/roffe/gocanusb v1.1.2 // indirect
-	github.com/roffe/goftdi v0.0.0-20250330120219-31feb988cb73 // indirect
-	github.com/stretchr/testify v1.11.1 // indirect
 	github.com/tevino/abool v0.0.0-20220530134649-2bfc934cb23c // indirect
 	go.bug.st/serial v1.6.4 // indirect
 	go.einride.tech/can v0.12.1 // indirect

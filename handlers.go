@@ -169,12 +169,9 @@ func (s *Server) recvManager(ctx context.Context, srv grpc.BidiStreamingServer[p
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
+			case e := <-dev.Event():
+				send(srv, gocan.SystemMsgError, []byte(e.String()))
 			case err := <-dev.Err():
-				// log.Println("adapter error:", err)
-				if gocan.IsRecoverable(err) {
-					send(srv, gocan.SystemMsgError, []byte(err.Error()))
-					continue
-				}
 				return fmt.Errorf("adapter error: %w", err)
 			case msg, ok := <-dev.Recv():
 				if !ok {
@@ -261,7 +258,7 @@ func (s *Server) GetAdapters(ctx context.Context, _ *emptypb.Empty) (*proto.Adap
 	//	log.Printf("metadata: %s: %v", k, v)
 	//}
 	var adapters []*proto.AdapterInfo
-	for _, a := range gocan.GetAdapterMap() {
+	for _, a := range gocan.ListAdapters() {
 		adapter := &proto.AdapterInfo{
 			Name:        &a.Name,
 			Description: &a.Description,

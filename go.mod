@@ -5,7 +5,7 @@ go 1.25.3
 require (
 	github.com/Microsoft/go-winio v0.6.2
 	github.com/energye/systray v1.0.2
-	github.com/roffe/gocan v1.2.6
+	github.com/roffe/gocan v1.2.7
 	golang.org/x/sync v0.17.0
 	google.golang.org/grpc v1.76.0
 	google.golang.org/protobuf v1.36.10

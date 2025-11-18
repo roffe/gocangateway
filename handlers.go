@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -137,15 +136,15 @@ func (s *Server) Stream(srv grpc.BidiStreamingServer[proto.CANFrame, proto.CANFr
 	defer log.Printf("%s disconnected", adaptername)
 	send(srv, 0, []byte("OK"))
 
-	adapterConfig.OnMessage = func(s string) {
-		_, file, no, ok := runtime.Caller(1)
-		if ok {
-			fmt.Printf("%s#%d %v\n", file, no, s)
-		} else {
-			log.Println(s)
-		}
-		send(srv, gocan.SystemMsg, []byte(s))
-	}
+	//adapterConfig.OnMessage = func(s string) {
+	//	_, file, no, ok := runtime.Caller(1)
+	//	if ok {
+	//		fmt.Printf("%s#%d %v\n", file, no, s)
+	//	} else {
+	//		log.Println(s)
+	//	}
+	//	send(srv, gocan.SystemMsg, []byte(s))
+	//}
 
 	// send mesage from canbus adapter to IPC
 	errg.Go(s.recvManager(ctx, srv, dev))
@@ -170,8 +169,14 @@ func (s *Server) recvManager(ctx context.Context, srv grpc.BidiStreamingServer[p
 			case <-ctx.Done():
 				return ctx.Err()
 			case e := <-dev.Event():
-				send(srv, gocan.SystemMsgError, []byte(e.String()))
+				switch e.Type {
+				case gocan.EventTypeError:
+					send(srv, gocan.SystemMsgError, []byte(e.Raw()))
+				default:
+					send(srv, gocan.SystemMsg, []byte(e.Raw()))
+				}
 			case err := <-dev.Err():
+				log.Println("adapter error:", err)
 				return fmt.Errorf("adapter error: %w", err)
 			case msg, ok := <-dev.Recv():
 				if !ok {

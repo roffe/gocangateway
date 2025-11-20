@@ -42,15 +42,21 @@ func adapterConfigFromContext(ctx context.Context) (string, *gocan.AdapterConfig
 	if err != nil {
 		return "", nil, fmt.Errorf("invalid useextendedid: %w", err)
 	}
+
+	additionalConfig := make(map[string]string)
+	if len(md["minversion"]) > 0 {
+		additionalConfig["minversion"] = md["minversion"][0]
+	}
+
 	return md["adapter"][0], &gocan.AdapterConfig{
-		Debug:                  dbg,
-		Port:                   md["port"][0],
-		PortBaudrate:           portBaudrate,
-		CANRate:                canrate,
-		CANFilter:              parseFilters(strings.Split(md["canfilter"][0], ",")),
-		UseExtendedID:          useExtendedID,
-		MinimumFirmwareVersion: md["minversion"][0],
-		PrintVersion:           true,
+		Debug:            dbg,
+		Port:             md["port"][0],
+		PortBaudrate:     portBaudrate,
+		CANRate:          canrate,
+		CANFilter:        parseFilters(strings.Split(md["canfilter"][0], ",")),
+		UseExtendedID:    useExtendedID,
+		AdditionalConfig: additionalConfig,
+		PrintVersion:     true,
 	}, nil
 }
 

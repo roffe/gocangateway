@@ -41,10 +41,8 @@ github.com/mdlayher/socket v0.5.1 h1:VZaqt6RkGkt2OE9l3GcC6nZkqD3xKeQLyfleW/uBcos
 github.com/mdlayher/socket v0.5.1/go.mod h1:TjPLHI1UgwEv5J1B5q0zTZq12A/6H7nKmtTanQE37IQ=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRIccs7FGNTlIRMkT8wgtp5eCXdBlqhYGL6U=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/roffe/gocan v1.2.6 h1:bUhkCO6GlBsQ/i3iMXHf9l2V9D5fvxNulRH7t7UVb5U=
-github.com/roffe/gocan v1.2.6/go.mod h1:vo1MhauJFNrpugFUiZKmN72bokN5D18ULCTgU1izFlU=
-github.com/roffe/gocan v1.2.7 h1:TFKBNJTldoZJDOnr2wggyPqIXsLB3KTmey8pwrKQq3s=
-github.com/roffe/gocan v1.2.7/go.mod h1:vo1MhauJFNrpugFUiZKmN72bokN5D18ULCTgU1izFlU=
+github.com/roffe/gocan v1.3.1 h1:Yr8g71PPJPiPRkmKpQ5ZrznjkdD6VF/wHF2Qs7Pl2QY=
+github.com/roffe/gocan v1.3.1/go.mod h1:vo1MhauJFNrpugFUiZKmN72bokN5D18ULCTgU1izFlU=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 github.com/tevino/abool v0.0.0-20220530134649-2bfc934cb23c h1:coVla7zpsycc+kA9NXpcvv2E4I7+ii6L5hZO2S6C3kw=

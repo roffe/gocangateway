@@ -243,7 +243,7 @@ func (s *Server) sendManager(srv grpc.BidiStreamingServer[proto.CANFrame, proto.
 func (s *Server) sendMessage(srv grpc.BidiStreamingServer[proto.CANFrame, proto.CANFrame], dev gocan.Adapter, msg *proto.CANFrame) {
 	t := msg.GetFrameType()
 	frame := gocan.NewFrame(*msg.Id, msg.Data, gocan.CANFrameType{
-		Type:      int(t.GetFrameType()),
+		Type:      gocan.ResponseType(t.GetFrameType()),
 		Responses: int(t.GetResponses()),
 	})
 	select {

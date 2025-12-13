@@ -1,6 +1,6 @@
 module github.com/roffe/gocangateway
 
-go 1.25.3
+go 1.25.5
 
 require (
 	github.com/Microsoft/go-winio v0.6.2

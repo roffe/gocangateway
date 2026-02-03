@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 
 	"github.com/energye/systray"
@@ -19,7 +20,10 @@ var (
 )
 
 //go:embed Icon.ico
-var iconData []byte
+var iconDataIco []byte
+
+//go:embed Icon.png
+var iconDataPng []byte
 
 func init() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
@@ -51,7 +55,11 @@ func main() {
 }
 func onReady(srv *Server) func() {
 	return func() {
-		systray.SetIcon(iconData)
+		if runtime.GOOS == "windows" {
+			systray.SetIcon(iconDataIco)
+		} else {
+			systray.SetIcon(iconDataPng)
+		}
 		systray.SetTitle("goCAN Gateway")
 		systray.SetTooltip("goCAN Gateway")
 		systray.SetOnClick(func(menu systray.IMenu) {

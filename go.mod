@@ -4,7 +4,7 @@ go 1.25.5
 
 require (
 	github.com/Microsoft/go-winio v0.6.2
-	github.com/energye/systray v1.0.2
+	github.com/energye/systray v1.0.3
 	github.com/roffe/gocan v1.3.2
 	golang.org/x/sync v0.17.0
 	google.golang.org/grpc v1.76.0
@@ -25,7 +25,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mdlayher/netlink v1.7.2 // indirect
 	github.com/mdlayher/socket v0.5.1 // indirect
-	github.com/tevino/abool v0.0.0-20220530134649-2bfc934cb23c // indirect
 	go.bug.st/serial v1.6.4 // indirect
 	go.einride.tech/can v0.12.1 // indirect
 	golang.org/x/mod v0.25.0 // indirect

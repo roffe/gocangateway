@@ -23,7 +23,7 @@ jobs:
     - name: Build gocangateway
       run: make cangateway
     - name: Archive
-      run: 7z a gocangateway_ubuntu_x64.7z gocangateway
+      run: 7z a gocangateway_ubuntu_x64.7z cangateway
     - name: Release
       uses: softprops/action-gh-release@v2
       if: github.ref_type == 'tag'

@@ -40,8 +40,8 @@ github.com/mdlayher/socket v0.5.1 h1:VZaqt6RkGkt2OE9l3GcC6nZkqD3xKeQLyfleW/uBcos
 github.com/mdlayher/socket v0.5.1/go.mod h1:TjPLHI1UgwEv5J1B5q0zTZq12A/6H7nKmtTanQE37IQ=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 h1:Jamvg5psRIccs7FGNTlIRMkT8wgtp5eCXdBlqhYGL6U=
 github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
-github.com/roffe/gocan v1.3.4 h1:zQvo3jSN+15ruriyLxyHeYTW/j73SfmnbfM5rR9gCCw=
-github.com/roffe/gocan v1.3.4/go.mod h1:+Iv2n6O0PqeZ098qy8CbM4iQ+grq25tO1OvpwtfO9mw=
+github.com/roffe/gocan v1.3.5 h1:rs+BzvgCoTzp5YaJLD5tmj7Bmp9D6BGNFAyqrdY0r+o=
+github.com/roffe/gocan v1.3.5/go.mod h1:+Iv2n6O0PqeZ098qy8CbM4iQ+grq25tO1OvpwtfO9mw=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 go.bug.st/serial v1.6.4 h1:7FmqNPgVp3pu2Jz5PoPtbZ9jJO5gnEnZIvnI1lzve8A=

@@ -1,0 +1,37 @@
+name: Build Linux Release
+
+on:
+  push:
+    tags:
+    - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.26.0'
+        cache: false
+    - name: Get dependencies
+      run: sudo apt-get update && sudo apt-get install 7zip gcc
+    - name: Build gocangateway
+      run: make gocangateway
+    - name: Archive
+      run: 7z a gocangateway_ubuntu_x64.7z gocangateway
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      if: github.ref_type == 'tag'
+      env:
+        GITHUB_REPOSITORY: roffe/gocangateway
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        make_latest: "true"
+        files: |
+          gocangateway_ubuntu_x64.7z

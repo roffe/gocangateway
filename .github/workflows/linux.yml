@@ -1,0 +1,25 @@
+name: Build Linux Develop
+on:
+  push:
+    branches:
+    - 'master'
+    - 'develop'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.26.0'
+        cache: false
+    - name: Get dependencies
+      run: sudo apt-get update && sudo apt-get install 7zip gcc
+    - name: Build gocangateway
+      run: make cangateway

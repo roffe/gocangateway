@@ -21,7 +21,7 @@ jobs:
     - name: Get dependencies
       run: sudo apt-get update && sudo apt-get install 7zip gcc
     - name: Build gocangateway
-      run: make gocangateway
+      run: make cangateway
     - name: Archive
       run: 7z a gocangateway_ubuntu_x64.7z gocangateway
     - name: Release

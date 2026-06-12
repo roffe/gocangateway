@@ -15,9 +15,7 @@ import (
 	_ "embed"
 )
 
-var (
-	ignoreQuit bool
-)
+var ignoreQuit bool
 
 //go:embed Icon.ico
 var iconDataIco []byte
@@ -53,6 +51,7 @@ func main() {
 		log.Fatalf("server: %v", err)
 	}
 }
+
 func onReady(srv *Server) func() {
 	return func() {
 		if runtime.GOOS == "windows" {
@@ -62,9 +61,9 @@ func onReady(srv *Server) func() {
 		}
 		systray.SetTitle("goCAN Gateway")
 		systray.SetTooltip("goCAN Gateway")
-		systray.SetOnClick(func(menu systray.IMenu) {
-			menu.ShowMenu()
-		})
+		//systray.SetOnClick(func(menu systray.IMenu) {
+		//	menu.ShowMenu()
+		//})
 		systray.SetOnRClick(func(menu systray.IMenu) {
 			menu.ShowMenu()
 		})
@@ -75,7 +74,7 @@ func onReady(srv *Server) func() {
 			}
 		})
 		// Sets the icon of a menu item.
-		//mQuit.SetIcon(icon.Data)
+		// mQuit.SetIcon(icon.Data)
 	}
 }
 

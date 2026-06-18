@@ -26,34 +26,73 @@ func adapterConfigFromContext(ctx context.Context) (string, *gocan.AdapterConfig
 	if !exists {
 		return "", nil, errors.New("connect metadata not found")
 	}
-	dbg, err := strconv.ParseBool(md["debug"][0])
+
+	// require returns the first value for key or an error, guarding against a
+	// version-skewed client that omits a field (md[key][0] would otherwise panic).
+	require := func(key string) (string, error) {
+		if vals := md.Get(key); len(vals) > 0 {
+			return vals[0], nil
+		}
+		return "", fmt.Errorf("missing required metadata %q", key)
+	}
+
+	adapter, err := require("adapter")
+	if err != nil {
+		return "", nil, err
+	}
+	port, err := require("port")
+	if err != nil {
+		return "", nil, err
+	}
+	debugStr, err := require("debug")
+	if err != nil {
+		return "", nil, err
+	}
+	dbg, err := strconv.ParseBool(debugStr)
 	if err != nil {
 		return "", nil, fmt.Errorf("invalid debug: %w", err)
 	}
-	portBaudrate, err := strconv.Atoi(md["port_baudrate"][0])
+	baudrateStr, err := require("port_baudrate")
+	if err != nil {
+		return "", nil, err
+	}
+	portBaudrate, err := strconv.Atoi(baudrateStr)
 	if err != nil {
 		return "", nil, fmt.Errorf("invalid port_baudrate: %w", err)
 	}
-	canrate, err := strconv.ParseFloat(md["canrate"][0], 64)
+	canrateStr, err := require("canrate")
+	if err != nil {
+		return "", nil, err
+	}
+	canrate, err := strconv.ParseFloat(canrateStr, 64)
 	if err != nil {
 		return "", nil, fmt.Errorf("invalid canrate: %w", err)
 	}
-	useExtendedID, err := strconv.ParseBool(md["useextendedid"][0])
+	useExtendedIDStr, err := require("useextendedid")
+	if err != nil {
+		return "", nil, err
+	}
+	useExtendedID, err := strconv.ParseBool(useExtendedIDStr)
 	if err != nil {
 		return "", nil, fmt.Errorf("invalid useextendedid: %w", err)
 	}
 
 	additionalConfig := make(map[string]string)
-	if len(md["minversion"]) > 0 {
-		additionalConfig["minversion"] = md["minversion"][0]
+	if v := md.Get("minversion"); len(v) > 0 {
+		additionalConfig["minversion"] = v[0]
 	}
 
-	return md["adapter"][0], &gocan.AdapterConfig{
+	var canFilter []uint32
+	if v := md.Get("canfilter"); len(v) > 0 {
+		canFilter = parseFilters(strings.Split(v[0], ","))
+	}
+
+	return adapter, &gocan.AdapterConfig{
 		Debug:            dbg,
-		Port:             md["port"][0],
+		Port:             port,
 		PortBaudrate:     portBaudrate,
 		CANRate:          canrate,
-		CANFilter:        parseFilters(strings.Split(md["canfilter"][0], ",")),
+		CANFilter:        canFilter,
 		UseExtendedID:    useExtendedID,
 		AdditionalConfig: additionalConfig,
 		PrintVersion:     true,
@@ -73,16 +112,31 @@ func parseFilters(filters []string) []uint32 {
 	return canfilters
 }
 
-func send(srv grpc.BidiStreamingServer[proto.CANFrame, proto.CANFrame], id uint32, data []byte) error {
-	frameTyp := proto.CANFrameTypeEnum_Incoming
-	return srv.Send(&proto.CANFrame{
-		Id:   &id,
-		Data: data,
-		FrameType: &proto.CANFrameType{
-			FrameType: &frameTyp,
-			Responses: new(uint32),
+type gocanStream = grpc.BidiStreamingServer[proto.CANFrame, proto.StreamMessage]
+
+// sendEvent forwards a typed event/error to the client over the stream.
+func sendEvent(srv gocanStream, level proto.EventLevel, msg string) error {
+	return srv.Send(&proto.StreamMessage{
+		Payload: &proto.StreamMessage_Event{
+			Event: &proto.Event{Level: level, Message: msg},
 		},
 	})
+}
+
+// eventLevel maps a gocan adapter event type to the wire event level.
+func eventLevel(t gocan.EventType) proto.EventLevel {
+	switch t {
+	case gocan.EventTypeFatal:
+		return proto.EventLevel_EVENT_FATAL
+	case gocan.EventTypeError:
+		return proto.EventLevel_EVENT_ERROR
+	case gocan.EventTypeWarning:
+		return proto.EventLevel_EVENT_WARN
+	case gocan.EventTypeDebug:
+		return proto.EventLevel_EVENT_DEBUG
+	default:
+		return proto.EventLevel_EVENT_INFO
+	}
 }
 
 func (s *Server) SendCommand(ctx context.Context, in *proto.Command) (*proto.CommandResponse, error) {
@@ -106,7 +160,7 @@ func (s *Server) SendCommand(ctx context.Context, in *proto.Command) (*proto.Com
 	}
 }
 
-func (s *Server) Stream(srv grpc.BidiStreamingServer[proto.CANFrame, proto.CANFrame]) error {
+func (s *Server) Stream(srv gocanStream) error {
 	// gctx, cancel := context.WithCancel(srv.Context())
 	gctx := srv.Context()
 
@@ -114,17 +168,6 @@ func (s *Server) Stream(srv grpc.BidiStreamingServer[proto.CANFrame, proto.CANFr
 	if err != nil {
 		return fmt.Errorf("failed to create adapter config: %w", err)
 	}
-
-	//	adapterConfig.OnError = func(err error) {
-	//		send(srv, gocan.SystemMsgError, []byte(err.Error()))
-	//		log.Printf("adapter error: %v", err)
-	//		_, file, no, ok := runtime.Caller(1)
-	//		if ok {
-	//			fmt.Printf("%s#%d %v\n", file, no, err)
-	//		} else {
-	//			log.Println(err)
-	//		}
-	//	}
 
 	dev, err := gocan.NewAdapter(adaptername, adapterConfig)
 	if err != nil {
@@ -140,7 +183,9 @@ func (s *Server) Stream(srv grpc.BidiStreamingServer[proto.CANFrame, proto.CANFr
 	defer dev.Close()
 	log.Printf("%s connected @ %g kbp/s", adaptername, adapterConfig.CANRate)
 	defer log.Printf("%s disconnected", adaptername)
-	send(srv, 0, []byte("OK"))
+	if err := sendEvent(srv, proto.EventLevel_EVENT_INFO, "OK"); err != nil {
+		return fmt.Errorf("failed to send init response: %w", err)
+	}
 
 	// send mesage from canbus adapter to IPC
 	errg.Go(s.recvManager(ctx, srv, dev))
@@ -151,25 +196,22 @@ func (s *Server) Stream(srv grpc.BidiStreamingServer[proto.CANFrame, proto.CANFr
 		if err == context.Canceled {
 			return nil
 		}
-		send(srv, gocan.SystemMsgUnrecoverableError, []byte(err.Error()))
+		_ = sendEvent(srv, proto.EventLevel_EVENT_FATAL, err.Error())
 		log.Println("stream error:", err)
 		return err
 	}
 	return nil
 }
 
-func (s *Server) recvManager(ctx context.Context, srv grpc.BidiStreamingServer[proto.CANFrame, proto.CANFrame], dev gocan.Adapter) func() error {
+func (s *Server) recvManager(ctx context.Context, srv gocanStream, dev gocan.Adapter) func() error {
 	return func() error {
 		for {
 			select {
 			case <-ctx.Done():
 				return ctx.Err()
 			case e := <-dev.Event():
-				switch e.Type {
-				case gocan.EventTypeError:
-					send(srv, gocan.SystemMsgError, []byte(e.Raw()))
-				default:
-					send(srv, gocan.SystemMsg, []byte(e.Raw()))
+				if err := sendEvent(srv, eventLevel(e.Type), e.Raw()); err != nil {
+					return err
 				}
 			case err := <-dev.Err():
 				log.Println("adapter error:", err)
@@ -190,18 +232,15 @@ func (s *Server) recvManager(ctx context.Context, srv grpc.BidiStreamingServer[p
 	}
 }
 
-func (s *Server) recvMessage(srv grpc.BidiStreamingServer[proto.CANFrame, proto.CANFrame], msg *gocan.CANFrame) error {
-	id := msg.Identifier
-	frameType := proto.CANFrameTypeEnum(msg.FrameType.Type)
-	responseCount := uint32(msg.FrameType.Responses)
-	//log.Println("frameTyp:", frameTyp)
-	//log.Println("responses:", responses)
-	mmsg := &proto.CANFrame{
-		Id:   &id,
-		Data: msg.Data,
-		FrameType: &proto.CANFrameType{
-			FrameType: &frameType,
-			Responses: &responseCount,
+func (s *Server) recvMessage(srv gocanStream, msg *gocan.CANFrame) error {
+	mmsg := &proto.StreamMessage{
+		Payload: &proto.StreamMessage_Frame{
+			Frame: &proto.CANFrame{
+				Id:        msg.Identifier,
+				Data:      msg.Data,
+				FrameType: proto.CANFrameTypeEnum(msg.FrameType.Type),
+				Responses: uint32(msg.FrameType.Responses),
+			},
 		},
 	}
 	if err := srv.Send(mmsg); err != nil {
@@ -210,7 +249,7 @@ func (s *Server) recvMessage(srv grpc.BidiStreamingServer[proto.CANFrame, proto.
 	return nil
 }
 
-func (s *Server) sendManager(srv grpc.BidiStreamingServer[proto.CANFrame, proto.CANFrame], dev gocan.Adapter) func() error {
+func (s *Server) sendManager(srv gocanStream, dev gocan.Adapter) func() error {
 	return func() error {
 		for {
 			msg, err := srv.Recv()
@@ -240,16 +279,15 @@ func (s *Server) sendManager(srv grpc.BidiStreamingServer[proto.CANFrame, proto.
 	}
 }
 
-func (s *Server) sendMessage(srv grpc.BidiStreamingServer[proto.CANFrame, proto.CANFrame], dev gocan.Adapter, msg *proto.CANFrame) {
-	t := msg.GetFrameType()
-	frame := gocan.NewFrame(*msg.Id, msg.Data, gocan.CANFrameType{
-		Type:      gocan.ResponseType(t.GetFrameType()),
-		Responses: int(t.GetResponses()),
+func (s *Server) sendMessage(srv gocanStream, dev gocan.Adapter, msg *proto.CANFrame) {
+	frame := gocan.NewFrame(msg.GetId(), msg.GetData(), gocan.CANFrameType{
+		Type:      gocan.ResponseType(msg.GetFrameType()),
+		Responses: int(msg.GetResponses()),
 	})
 	select {
 	case dev.Send() <- frame:
 	default:
-		send(srv, gocan.SystemMsgError, []byte("adapter send buffer full"))
+		_ = sendEvent(srv, proto.EventLevel_EVENT_ERROR, "adapter send buffer full")
 	}
 }
 
@@ -261,14 +299,14 @@ func (s *Server) GetAdapters(ctx context.Context, _ *emptypb.Empty) (*proto.Adap
 	var adapters []*proto.AdapterInfo
 	for _, a := range gocan.ListAdapters() {
 		adapter := &proto.AdapterInfo{
-			Name:        &a.Name,
-			Description: &a.Description,
+			Name:        a.Name,
+			Description: a.Description,
 			Capabilities: &proto.AdapterCapabilities{
-				HSCAN: &a.Capabilities.HSCAN,
-				KLine: &a.Capabilities.KLine,
-				SWCAN: &a.Capabilities.SWCAN,
+				HSCAN: a.Capabilities.HSCAN,
+				KLine: a.Capabilities.KLine,
+				SWCAN: a.Capabilities.SWCAN,
 			},
-			RequireSerialPort: &a.RequiresSerialPort,
+			RequireSerialPort: a.RequiresSerialPort,
 		}
 		adapters = append(adapters, adapter)
 	}
@@ -278,5 +316,7 @@ func (s *Server) GetAdapters(ctx context.Context, _ *emptypb.Empty) (*proto.Adap
 }
 
 func (s *Server) GetSerialPorts(ctx context.Context, _ *emptypb.Empty) (*proto.SerialPorts, error) {
-	return nil, nil
+	// Serial ports are enumerated client-side; return an empty (non-nil) list so
+	// callers never receive a nil message alongside a nil error.
+	return &proto.SerialPorts{}, nil
 }

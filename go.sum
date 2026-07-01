@@ -34,8 +34,8 @@ github.com/mdlayher/netlink v1.8.0 h1:e7XNIYJKD7hUct3Px04RuIGJbBxy1/c4nX7D5Yyvvl
 github.com/mdlayher/netlink v1.8.0/go.mod h1:UhgKXUlDQhzb09DrCl2GuRNEglHmhYoWAHid9HK3594=
 github.com/mdlayher/socket v0.5.1 h1:VZaqt6RkGkt2OE9l3GcC6nZkqD3xKeQLyfleW/uBcos=
 github.com/mdlayher/socket v0.5.1/go.mod h1:TjPLHI1UgwEv5J1B5q0zTZq12A/6H7nKmtTanQE37IQ=
-github.com/roffe/gocan v1.4.5 h1:4dLsm9ulGWmpteyEcKWmebnilhaXn3r740DIKAkN/Wg=
-github.com/roffe/gocan v1.4.5/go.mod h1:vayI3roc38RKMq5B/yeG+hQt7HUog5Izx8EvpQRrmtg=
+github.com/roffe/gocan v1.4.6 h1:t0ID9uLYgR/61XAPUwfhhbItpxi54n36dzqQ/G3QcZA=
+github.com/roffe/gocan v1.4.6/go.mod h1:vayI3roc38RKMq5B/yeG+hQt7HUog5Izx8EvpQRrmtg=
 go.bug.st/serial v1.7.1 h1:5aP8wYL0UjEYOVs3oPAGscjaSfRQLHtCvBFXNN/rwtc=
 go.bug.st/serial v1.7.1/go.mod h1:d0MmS16Qt9b1m06yoYRNUXhRRTJV5Qg2S5EKqQtnayQ=
 go.einride.tech/can v0.16.1 h1:s9MqX1OR6ujGxvl+gOWAGL54MC3kaPE+cgxBCUfDrB8=
